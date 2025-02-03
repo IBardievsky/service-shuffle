@@ -8,7 +8,7 @@ This repository contains Spring Boot microservice:
 
 ### 📋 **Description**
 
-The **Service Shuffle** API accepts an integer and returns a shuffled sequence of numbers from `1` to `n`.
+The **Service Shuffle** API accepts an integer and returns a shuffled sequence of numbers from `1` to `1000`.
 
 ### ⚙️ **Tech Stack**
 - **Java 11**
