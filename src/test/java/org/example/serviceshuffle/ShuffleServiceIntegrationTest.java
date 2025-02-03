@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.example.serviceshuffle.utils.ConstantValues.INVALID_NUMBER_MESSAGE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -35,12 +36,32 @@ class ShuffleServiceIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1001})
-    void failedShuffleEndpoint(int number) throws Exception {
+    void valueIsOutOfRange(int number) throws Exception {
         ShuffleRequest request = new ShuffleRequest(number);
+        String requestStringValue = new ObjectMapper().writeValueAsString(request);
+        sendRequestAndVerifyInvalidNumberMessage(requestStringValue);
+    }
+
+    @Test
+    void missedNumberValue() throws Exception {
+        sendRequestAndVerifyInvalidNumberMessage("{}");
+    }
+
+    @Test
+    void nullInsteadOfNumber() throws Exception {
+        sendRequestAndVerifyInvalidNumberMessage("{\"number\":null}");
+    }
+
+    @Test
+    void stringInsteadOfNumber() throws Exception {
+        sendRequestAndVerifyInvalidNumberMessage("{\"number\":\"abs\"}");
+    }
+
+    private void sendRequestAndVerifyInvalidNumberMessage(String number) throws Exception {
         mockMvc.perform(post("/shuffle")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
+                        .content(number))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Number must be between 1 and 1000"));
+                .andExpect(content().string(INVALID_NUMBER_MESSAGE));
     }
 }
